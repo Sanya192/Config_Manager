@@ -1,15 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Config_Helper {
     public class Config_Manager {
         public Dictionary<string, string> Settings { get; set; }
         public string Path { get; set; }
         public Config_Manager(string path) {
-            Path = path;
+            path = path.Replace(" ", String.Empty);
+            if (!File.Exists(path)) {
+                Settings=CreateConfig();
+                Console.WriteLine("Do you want to save it?");
+                string answer = Console.ReadLine();
+                if (answer.StartsWith("y")||answer.StartsWith("Y")||answer=="".Replace(" ",string.Empty)) {
+                    SaveConfig(path);
+                }
+            }
         }
-        public void CreateConfig() {
+        public Dictionary<string,string> CreateConfig() {
             Dictionary<string, string> settings = new Dictionary<string, string>();
             string input;
             int comment = 0;
@@ -33,14 +42,46 @@ namespace Config_Helper {
             foreach (var item in settings) {
                 Console.WriteLine($"{item.Key}: {item.Value}");
             }
+            return settings;
+        }
+        public void LoadConfig(string path) {
+            Dictionary<string, string> settings = new Dictionary<string, string>();
+            var input=File.ReadAllLines(path)
+                .Select(p => p.Replace(" ", string.Empty))
+                .Select(p => p.Split(':'));
+            int comment = 0;
+            foreach (var item in input) {
+                if (item[0].StartsWith("#")) {
+                    settings.Add($"#comment{comment++}", item[0]);
+                }
+                else {
+                    settings.Add(item[0], item[1]);
+                }
+            }
+        }
+        public void SaveConfig(string path) {
             Console.WriteLine("Which name should i save it?:");
-            using (var sw = new StreamWriter(Console.ReadLine().Replace(" ", String.Empty)))
-                foreach (var item in settings) {
+            //string path = Console.ReadLine().Replace(" ", String.Empty);
+            using (var sw = new StreamWriter(path))
+                foreach (var item in Settings) {
                     if (item.Key.StartsWith("#")) {
                         sw.WriteLine($"#{item.Value}");
                     }
                     sw.WriteLine($"{item.Key}: {item.Value}");
                 }
+        }
+        //usefull but not used
+        public string SaveConfig() {
+            Console.WriteLine("Which name should i save it?:");
+            string path = Console.ReadLine().Replace(" ", String.Empty);
+            using (var sw = new StreamWriter(path))
+                foreach (var item in Settings) {
+                    if (item.Key.StartsWith("#")) {
+                        sw.WriteLine($"#{item.Value}");
+                    }
+                    sw.WriteLine($"{item.Key}: {item.Value}");
+                }
+            return path;
         }
     }
 }
