@@ -14,26 +14,26 @@ namespace Config_Helper {
             string input;
             int comment = 0;
             while (true) {
-                Console.WriteLine("Írd be a következő beállítás nevét(Üres ha itt a vége,# ha komment)");
+                Console.WriteLine("Please write your next settings name!(empty if this is the end, # for comments)");
                 input = Console.ReadLine().Replace(" ", String.Empty);
                 if (input == "0" || input == "")
                     break;
                 else if (settings.ContainsKey(input))
-                    Console.WriteLine("Ilyen nevű beállítás már van!!");
+                    Console.WriteLine("Settings with this name already exists!!");
                 else if (input.StartsWith("#")) {
-                    Console.WriteLine("Kérem a kommentet");
-                    settings.Add($"#komment{comment++}", Console.ReadLine().Replace(" ", String.Empty));
+                    Console.WriteLine("Please write your comment");
+                    settings.Add($"#comment{comment++}", Console.ReadLine().Replace(" ", String.Empty));
                 }
                 else {
-                    Console.WriteLine("Kérem az értékét!");
+                    Console.WriteLine("Please write it's value!");
                     settings.Add(input, Console.ReadLine().Replace(" ", String.Empty));
                 }
             }
-            Console.WriteLine("Így néz ki a config kérem a file:");
+            Console.WriteLine("This is how the config looks:");
             foreach (var item in settings) {
                 Console.WriteLine($"{item.Key}: {item.Value}");
             }
-            Console.WriteLine("Hova mentsem el?:");
+            Console.WriteLine("Which name should i save it?:");
             using (var sw = new StreamWriter(Console.ReadLine().Replace(" ", String.Empty)))
                 foreach (var item in settings) {
                     if (item.Key.StartsWith("#")) {
