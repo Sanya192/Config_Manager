@@ -17,21 +17,25 @@ namespace Config_Helper {
                     SaveConfig(path);
                 }
             }
+            else {
+                Settings = LoadConfig(path);
+                Path = path;
+            }
         }
         public Dictionary<string,string> CreateConfig() {
             Dictionary<string, string> settings = new Dictionary<string, string>();
             string input;
             int comment = 0;
             while (true) {
-                Console.WriteLine("Please write your next settings name!(empty if this is the end, # for comments)");
+                Console.WriteLine("Please write your next settings name!(empty if this is the end,start with # for comments)");
                 input = Console.ReadLine().Replace(" ", String.Empty);
                 if (input == "0" || input == "")
                     break;
                 else if (settings.ContainsKey(input))
                     Console.WriteLine("Settings with this name already exists!!");
                 else if (input.StartsWith("#")) {
-                    Console.WriteLine("Please write your comment");
-                    settings.Add($"#comment{comment++}", Console.ReadLine().Replace(" ", String.Empty));
+                    //Console.WriteLine("Please write your comment");
+                    settings.Add($"#comment{comment++}",input);
                 }
                 else {
                     Console.WriteLine("Please write it's value!");
@@ -44,7 +48,7 @@ namespace Config_Helper {
             }
             return settings;
         }
-        public void LoadConfig(string path) {
+        public Dictionary<string, string> LoadConfig(string path) {
             Dictionary<string, string> settings = new Dictionary<string, string>();
             var input=File.ReadAllLines(path)
                 .Select(p => p.Replace(" ", string.Empty))
@@ -58,6 +62,7 @@ namespace Config_Helper {
                     settings.Add(item[0], item[1]);
                 }
             }
+            return settings;
         }
         public void SaveConfig(string path) {
             Console.WriteLine("Which name should i save it?:");
@@ -65,8 +70,9 @@ namespace Config_Helper {
             using (var sw = new StreamWriter(path))
                 foreach (var item in Settings) {
                     if (item.Key.StartsWith("#")) {
-                        sw.WriteLine($"#{item.Value}");
+                        sw.WriteLine($"{item.Value}");
                     }
+                    else
                     sw.WriteLine($"{item.Key}: {item.Value}");
                 }
         }
